@@ -4,6 +4,11 @@ A Kotlin + Jetpack Compose (Material 3) app that records a cough with the phone
 mic, sends it to your model server, and shows the classification with a Viridis
 probability chart, an uncertainty flag, and the acoustic biomarkers.
 
+**Includes:** an animated splash screen, a 3-tab bottom menu (Record · History ·
+Settings), a **play button** to listen back to the recorded or uploaded clip, a
+persistent **History** of past screenings, and **Light / Dark / System** theming
+(toggle in Settings).
+
 ## Open & build
 
 1. Install **Android Studio** (Ladybug 2024.2 or newer).
@@ -16,7 +21,25 @@ probability chart, an uncertainty flag, and the acoustic biomarkers.
 > Requires `compileSdk 35` — install "Android 15 (API 35)" via the SDK Manager if
 > Studio prompts. Minimum device: Android 8.0 (API 26).
 
-## Point the app at your backend
+## Two ways to run the model
+
+The app has a **mode switch in Settings**:
+
+* **On-device (offline)** — runs the exported `rule_cough.tflite` right on the phone,
+  no server, no internet. Uses the **mel-only ResNet**; the audio front-end is baked
+  into the model, so the app just feeds raw audio. To enable it, drop the two files
+  from the notebook's *"Export on-device model"* cell into **`app/src/main/assets/`**:
+
+  ```
+  app/src/main/assets/rule_cough.tflite
+  app/src/main/assets/labels.txt
+  ```
+  Then rebuild. (Uncertainty and the 27 acoustic biomarkers aren't available offline.)
+
+* **Server** — sends the audio to your FastAPI backend for the full **multi-view**
+  model with Monte-Carlo uncertainty and acoustic biomarkers.
+
+## Point the app at your backend  (Server mode)
 
 Start the backend first (see `../backend/README.md`), then in the app open
 **Settings** and set the **Server URL**:
