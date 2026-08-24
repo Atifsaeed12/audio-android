@@ -49,12 +49,12 @@ private fun riskColor(level: String): Color = when (level.lowercase()) {
 
 @Composable
 fun HistoryScreen(vm: MainViewModel) {
-    val items = vm.history
+    val entries = vm.history
     Column(Modifier.fillMaxSize().padding(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("History", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.weight(1f))
-            if (items.isNotEmpty()) {
+            if (entries.isNotEmpty()) {
                 Row(
                     Modifier.clip(RoundedCornerShape(10.dp))
                         .clickable { vm.clearHistory() }
@@ -75,7 +75,7 @@ fun HistoryScreen(vm: MainViewModel) {
             style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(16.dp))
 
-        if (items.isEmpty()) {
+        if (entries.isEmpty()) {
             Column(
                 Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -92,7 +92,7 @@ fun HistoryScreen(vm: MainViewModel) {
             }
         } else {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                items(items) { e -> HistoryRow(e) { vm.openHistory(e) } }
+                items(entries) { e -> HistoryRow(e) { vm.openHistory(e) } }
             }
         }
     }

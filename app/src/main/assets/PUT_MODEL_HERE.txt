@@ -1,0 +1,8 @@
+On-device model files go in THIS folder (app/src/main/assets/):
+
+  rule_cough.tflite   <- produced by the notebook's "Export on-device model" cell
+  labels.txt          <- one class name per line, also from that cell
+
+Download both from your Kaggle notebook output (/kaggle/working/) and drop them
+here, then rebuild the app. Until rule_cough.tflite is present, the app's
+"On-device" mode shows a message and you can use "Server" mode instead.
