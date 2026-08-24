@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme; the actual colors are driven by Compose Material 3 in Theme.kt.
+         This just gives the app a dark-purple splash background before Compose loads. -->
+    <style name="Theme.RULeCough" parent="android:Theme.Material.NoActionBar">
+        <item name="android:statusBarColor">@color/viridis_purple</item>
+        <item name="android:windowBackground">@color/viridis_purple</item>
+    </style>
+</resources>
