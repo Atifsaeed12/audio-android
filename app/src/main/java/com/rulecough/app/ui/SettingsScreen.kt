@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,6 +55,63 @@ fun SettingsScreen(vm: MainViewModel) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodyMedium
         )
+
+        Spacer(Modifier.height(22.dp))
+        // ---- appearance / night mode ----
+        Text(
+            "APPEARANCE",
+            fontSize = 11.sp, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(8.dp))
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant).padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            listOf("system" to "System", "light" to "Light", "dark" to "Dark").forEach { (key, label) ->
+                val active = vm.themeMode == key
+                Box(
+                    Modifier.weight(1f).clip(RoundedCornerShape(11.dp))
+                        .background(
+                            if (active) MaterialTheme.colorScheme.primary else Color.Transparent
+                        )
+                        .clickable { vm.setThemeMode(key) }
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        label,
+                        color = if (active) MaterialTheme.colorScheme.onPrimary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (active) FontWeight.SemiBold else FontWeight.Normal
+                    )
+                }
+            }
+        }
+
+        Spacer(Modifier.height(22.dp))
+        // ---- inference mode: on-device vs server ----
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant).padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text("Run on-device (offline)", fontWeight = FontWeight.SemiBold,
+                    style = MaterialTheme.typography.titleMedium)
+                Text(
+                    if (vm.onDevice)
+                        (if (vm.onDeviceModelAvailable) "Using the bundled .tflite model — no server needed."
+                         else "Model not bundled yet — add rule_cough.tflite to assets.")
+                    else "Audio is sent to your server for the full multi-view model.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Switch(checked = vm.onDevice, onCheckedChange = { vm.setOnDevice(it) })
+        }
 
         Spacer(Modifier.height(22.dp))
         Text(

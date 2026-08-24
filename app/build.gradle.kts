@@ -30,6 +30,11 @@ android {
         compose = true
     }
 
+    // .tflite must stay uncompressed so it can be memory-mapped at runtime.
+    androidResources {
+        noCompress += "tflite"
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -63,4 +68,11 @@ dependencies {
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+
+    // On-device inference (LiteRT / TensorFlow Lite runtime). The .tflite exported
+    // by the notebook is standard LiteRT and loads with this interpreter.
+    implementation("org.tensorflow:tensorflow-lite:2.16.1")
+
+    // JSON for the local History store.
+    implementation("com.google.code.gson:gson:2.11.0")
 }

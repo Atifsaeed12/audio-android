@@ -48,6 +48,14 @@ private val DarkColors = darkColorScheme(
     onError = Color.White
 )
 
+/** Resolve a stored theme mode ("system"/"light"/"dark") to a boolean. */
+@Composable
+fun resolveDark(mode: String): Boolean = when (mode) {
+    "dark" -> true
+    "light" -> false
+    else -> isSystemInDarkTheme()
+}
+
 @Composable
 fun RULeCoughTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),

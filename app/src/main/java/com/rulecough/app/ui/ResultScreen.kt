@@ -46,11 +46,14 @@ private fun riskColor(level: String): Color = when (level.lowercase()) {
 }
 
 @Composable
-fun ResultScreen(result: PredictResponse, onAgain: () -> Unit) {
+fun ResultScreen(result: PredictResponse, audioPath: String?, onAgain: () -> Unit) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp)
     ) {
         VerdictCard(result)
+
+        Spacer(Modifier.height(14.dp))
+        AudioPlayerBar(audioPath)
 
         SectionLabel("Class probabilities")
         result.probabilities.forEachIndexed { i, p ->
@@ -141,7 +144,8 @@ private fun VerdictCard(result: PredictResponse) {
             )
             Text(
                 "${(result.confidence * 100).toInt()}% confidence · " +
-                    (if (result.highUncertainty) "high" else "low") + " uncertainty",
+                    (if (result.mcPasses == 0) "on-device"
+                     else (if (result.highUncertainty) "high" else "low") + " uncertainty"),
                 color = Color.White.copy(alpha = 0.92f),
                 fontFamily = FontFamily.Monospace,
                 fontSize = 13.sp
@@ -198,6 +202,7 @@ private fun ProbabilityBar(name: String, pct: Float, color: Color, emphasize: Bo
 
 @Composable
 private fun UncertaintyRow(result: PredictResponse) {
+    val onDeviceMode = result.mcPasses == 0
     val col = if (result.highUncertainty) RiskModerate else RiskLow
     Row(
         Modifier.fillMaxWidth().padding(top = 14.dp).clip(RoundedCornerShape(14.dp))
@@ -207,20 +212,26 @@ private fun UncertaintyRow(result: PredictResponse) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            Modifier.size(38.dp).clip(RoundedCornerShape(10.dp)).background(col),
+            Modifier.size(38.dp).clip(RoundedCornerShape(10.dp))
+                .background(if (onDeviceMode) MaterialTheme.colorScheme.primary else col),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                String.format("%.2f", result.uncertainty),
-                color = Color.White, fontSize = 12.sp, fontFamily = FontFamily.Monospace
+                if (onDeviceMode) "⚙" else String.format("%.2f", result.uncertainty),
+                color = Color.White, fontSize = 13.sp, fontFamily = FontFamily.Monospace
             )
         }
         Spacer(Modifier.width(10.dp))
         Text(
-            if (result.highUncertainty)
-                "High uncertainty across ${result.mcPasses} Monte-Carlo passes — clinical confirmation recommended."
-            else
-                "Low uncertainty across ${result.mcPasses} Monte-Carlo passes — a consistent screening signal.",
+            when {
+                onDeviceMode ->
+                    "On-device estimate (mel-only model). Uncertainty isn't computed offline; " +
+                        "use Server mode for the multi-view model with Monte-Carlo uncertainty."
+                result.highUncertainty ->
+                    "High uncertainty across ${result.mcPasses} Monte-Carlo passes — clinical confirmation recommended."
+                else ->
+                    "Low uncertainty across ${result.mcPasses} Monte-Carlo passes — a consistent screening signal."
+            },
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

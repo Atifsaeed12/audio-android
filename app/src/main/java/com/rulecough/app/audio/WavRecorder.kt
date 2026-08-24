@@ -62,9 +62,9 @@ class WavRecorder(private val sampleRate: Int = 16000) {
         }
     }
 
-    /** Stop recording and write out a .wav file; returns it (or null if empty). */
-    fun stopAndSave(outFile: File): File? {
-        if (!recording) return null
+    /** Stop recording; return the raw 16-bit PCM captured (empty if none). */
+    fun stopAndGetPcm(): ByteArray {
+        if (!recording) return ByteArray(0)
         recording = false
         try {
             worker?.join(500)
@@ -78,9 +78,20 @@ class WavRecorder(private val sampleRate: Int = 16000) {
             release()
         }
         recorder = null
-        val data = pcm.toByteArray()
+        return pcm.toByteArray()
+    }
+
+    /** Stop recording and write out a .wav file; returns it (or null if empty). */
+    fun stopAndSave(outFile: File): File? {
+        val data = stopAndGetPcm()
         if (data.isEmpty()) return null
         writeWav(outFile, data, sampleRate)
+        return outFile
+    }
+
+    /** Write a WAV file from already-captured PCM (used after stopAndGetPcm). */
+    fun savePcmToWav(outFile: File, pcmData: ByteArray): File {
+        writeWav(outFile, pcmData, sampleRate)
         return outFile
     }
 
